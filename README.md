@@ -1,5 +1,5 @@
 <p align="center">
-
+ 
 </p>
 
 <h1 align="center">🐾 I Lost My Cabron</h1>
@@ -71,7 +71,14 @@ Chaque année, des milliers d'animaux disparaissent. Les propriétaires se retro
 
 <br>
 
-### 3. Panneau d'administration
+### 3. Espace utilisateur
+Tableau de bord personnel : suivi et gestion des annonces publiées par l'utilisateur connecté.
+
+<img src="./img/utilisateur.png" alt="Espace utilisateur" width="800"/>
+
+<br>
+
+### 4. Panneau d'administration
 Gestion des utilisateurs, suivi des dernières connexions et modération des comptes.
 
 <img src="./img/partie_admin.png" alt="Panneau admin" width="800"/>
@@ -131,4 +138,6 @@ L'application est accessible par défaut sur :
 Projet développé en équipe dans le cadre d'un projet académique / personnel, en méthodologie Git collaborative (branches par contributeur).
 
 ---
+
+
 
