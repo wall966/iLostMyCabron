@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router";
 import axios from "axios";
 import "./Register.css";
 import LoginGoogle from "./LoginGoogle";
-
+ 
 function Register() {
     // rediriger l'utilisateur :
     const navigate = useNavigate();
@@ -17,19 +17,19 @@ function Register() {
         password: "",
         phone_number: "",
     });
-
+ 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-
+ 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
+ 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
-
+ 
         try {
             const response = await axios.post(
                 "http://localhost:3000/users/register",
@@ -47,8 +47,8 @@ function Register() {
             setLoading(false);
         }
     };
-
-
+ 
+ 
     return (
         <section className="register-container">
             <form className="register-form" onSubmit={handleSubmit}>
@@ -94,7 +94,7 @@ function Register() {
                     onChange={handleChange}
                     required
                 />
-
+ 
                 <button type="submit" disabled={loading}>
                     {loading ? "Création..." : "S'inscrire"}
                 </button>
@@ -103,9 +103,7 @@ function Register() {
                 <p className="login-link">
                     Déjà un compte ? <Link to="/login">Se connecter</Link>
                 </p>
-                <p>
-                    Déjà un compte ? <Link to="/login">Se connecter</Link>
-                </p>
+                     
                 <p className="guest-link">
                     Continuer avec un compte invité ? <Link to="/guest">Compte invité</Link>
                 </p>

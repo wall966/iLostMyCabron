@@ -28,7 +28,7 @@ function Home() {
         <div className="App">
             <header className="App-header"></header>
 
-            <section>
+            <section className="hero-section">
                 <div className="Caramelo_run" style={styleImage} alt="Logo Caramelo" />
                 <img src={logoCaramelo} className="logo_welcome" alt="Logo Cabron" />
             </section>

@@ -4,7 +4,7 @@ import Home from "./home";
 import Welcome from "./welcome";
 import About from './About';
 import Contact from './Contact';
-import Services from './Servives';
+import Services from './Services';
 import Register from './RegisterConnexion/Register';
 import Login from './RegisterConnexion/Login';
 import Guest from './RegisterConnexion/Guest';

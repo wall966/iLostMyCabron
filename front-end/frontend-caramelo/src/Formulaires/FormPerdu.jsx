@@ -103,13 +103,20 @@ const FormPerdu = () => {
         const Status = "perdu";
 
         try {
-            if (Photo.length > 0) {
+                    if (Photo.length > 0) {
                 const file = Photo[0];
-                const fileName = `${Date.now()}_${file.name}`;
+                
+                // Remove acentos, espaços e caracteres especiais do nome original
+                const sanitizedName = file.name
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")   // remove acentos
+                    .replace(/[^a-zA-Z0-9.\-_]/g, "_"); // troca qualquer coisa que não seja letra/número/ponto/hífen/underline por "_"
+
+                const fileName = `${Date.now()}_${sanitizedName}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from("photos")
-                    .upload(fileName, file);
+                    .upload(fileName, file); 
 
                 if (uploadError) throw uploadError;
 

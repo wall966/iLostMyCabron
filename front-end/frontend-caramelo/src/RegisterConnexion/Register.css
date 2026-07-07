@@ -1,8 +1,10 @@
 .register-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center !important;
+  align-items: center !important;
   min-height: 100vh;
+  width: 100%;
+  flex: 1;
   background-color: #FEFAF3;
   background-image: url("../assets/Photo_i_lost_my_cabron.jpg");
   background-size: 40%;
@@ -42,6 +44,7 @@
   font-size: 15px;
   cursor: pointer;
 }
+
 .register-form button:hover {
   background-color: #DC5D34;
 }
@@ -69,4 +72,22 @@
   text-align: center;
   font-size: 13px;
   margin-top: 8px;
+}
+
+.login-link a,
+.guest-link a,
+.link_to_welcome {
+  background: none !important;
+  border: none !important;
+  color: #072336 !important;
+  text-decoration: underline !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  display: inline !important;
+}
+
+.login-link a:hover,
+.guest-link a:hover,
+.link_to_welcome:hover {
+  color: #DC5D34 !important;
 }

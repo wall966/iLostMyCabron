@@ -105,7 +105,7 @@ function Account() {
     }, []);
 
     // Filtre les pets selon le statut choisi dans le menu (deja filtres par Owner via /pets/mine)
-    const normalise = (str) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalise = (str) => (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const petsFiltres = listPets.filter((pet) => {
         if (filtrePet === "tous") return true;
         return normalise(pet.Status) === normalise(filtrePet);
@@ -163,11 +163,11 @@ function Account() {
                     {open && (
                         <ul style={{ position: "absolute", left: "100%", top: 100, listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
                             <li>
-                                <button className="logout" onClick={() => navigate("/FormPerdu")}>J'ai perdu</button>
+                                <button className="logout" onClick={() => navigate("/FormPerdu")}>Animal perdu</button>
                             </li>
                             <hr style={{ width: "100%" }} />
                             <li>
-                                <button className="logout" onClick={() => navigate("/FormTrouve")}>Pet trouvé</button>
+                                <button className="logout" onClick={() => navigate("/FormTrouve")}>Animal trouvé </button>
                             </li>
                         </ul>
                     )}
@@ -177,7 +177,7 @@ function Account() {
                 </ul>
                 <br/>
                 <section>
-                    <ul>
+                    <ul className="navBarBtn">
                         <li>
                             <Link to="/about">A propos de nous</Link>
                         </li>
@@ -190,7 +190,7 @@ function Account() {
                     </ul>
                 </section>
 
-                <input type="text" className='search' />
+              
 
             </header>
 
@@ -245,14 +245,14 @@ function Account() {
                                         </Accordion.Item>
                                     </Accordion>
 
-                                    <div className="card-actions mt-2 d-flex gap-2">
-                                        <Button variant="primary" size="sm" onClick={() => handleEditPet(animal._id)}>
-                                            Modifier
-                                        </Button>
-                                        <Button variant="danger" size="sm" onClick={() => handleDeletePet(animal._id)}>
-                                            Supprimer
-                                        </Button>
-                                    </div>
+                                  <div className="card-actions mt-2 d-flex gap-2">
+                                    <button className="edit-pet" onClick={() => handleEditPet(animal._id)}>
+                                        Modifier
+                                    </button>
+                                    <button className="delete-pet" onClick={() => handleDeletePet(animal._id)}>
+                                        Supprimer
+                                    </button>
+                                </div>
                                 </Card.Body>
                             </Card>
                         ))}

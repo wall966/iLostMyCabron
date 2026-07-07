@@ -64,8 +64,8 @@ const UserSchema = new mongoose.Schema({
         default: null
     },
     // code que l'utilsateur invité (anonyme) visualise pour suivre ses annonces
-    trackingCode:{
-        type: String, 
+    trackingCode: {
+        type: String,
         unique: true,
         sparse: true
     },
@@ -86,7 +86,7 @@ UserSchema.pre('save', async function () {
     }
     // génère un "sel" aléatoire (le 10 est le nombre de tours de calcul 
     // plus il est élevé, plus c'est sécurisé mais plus c'est lent ; 10 est un bon compromis standard):
-    
+
     const salt = await bcrypt.genSalt(10);
     // transforme le mot de passe en clair en une chaîne hashée irréversible:
     this.password = await bcrypt.hash(this.password, salt);

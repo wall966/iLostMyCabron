@@ -1,48 +1,52 @@
 .admin-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  align-items: center;       /* centra a tabela horizontalmente */
   min-height: 100vh;
+  width: 100%;
+  padding: 20px 40px;
+  box-sizing: border-box;
   background-color: #FEFAF3;
   background-image: url("../assets/Photo_i_lost_my_cabron.jpg");
   background-size: 15%;
   background-repeat: no-repeat;
-
 }
 
 .admin-container h2 {
   margin-bottom: 20px;
   text-align: center;
+  width: 100%;
 }
 
 .admin-table {
   width: 100%;
+  max-width: 1200px;
   border-collapse: collapse;
 }
-
+ 
 .admin-table th,
 .admin-table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #e5e5e5;
 }
-
+ 
 .admin-table th {
   background-color: #f5f5f5;
   font-weight: 600;
   font-size: 14px;
   color: #333;
 }
-
+ 
 .admin-table td {
   font-size: 14px;
   color: #444;
 }
-
+ 
 .admin-table tbody tr:hover {
   background-color: #fafafa;
 }
-
+ 
 .delete-button {
   padding: 6px 14px;
   background-color: #dc2626;
@@ -52,25 +56,25 @@
   font-size: 13px;
   cursor: pointer;
 }
-
+ 
 .delete-button:hover {
   background-color: #b91c1c;
 }
-
+ 
 .error-message {
   color: #dc2626;
   font-size: 14px;
   text-align: center;
   margin-bottom: 16px;
 }
-
+ 
 .access-denied {
   text-align: center;
   font-size: 16px;
   color: #dc2626;
   padding: 40px 20px;
 }
-
+ 
 .go-back-to-account {
   display: inline-block;
   margin-bottom: 20px;
@@ -81,11 +85,11 @@
   border-radius: 4px;
   font-size: 14px;
 }
-
+ 
 .go-back-to-account:hover {
   background-color: black;
 }
-
+ 
 .logout-button {
   display: inline-block;
   margin-bottom: 20px;
@@ -99,7 +103,7 @@
   font-size: 14px;
   cursor: pointer;
 }
-
+ 
 .logout-button:hover {
   background-color: #b91c1c;
 }

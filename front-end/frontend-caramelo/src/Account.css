@@ -35,3 +35,33 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     border-radius: 10px;
 }
+
+.edit-pet {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.edit-pet:hover {
+  text-decoration: underline;
+  color: rgb(12, 3, 151);
+}
+
+.delete-pet {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.delete-pet:hover {
+  text-decoration: underline;
+  color: rgb(255, 0, 43);
+}
