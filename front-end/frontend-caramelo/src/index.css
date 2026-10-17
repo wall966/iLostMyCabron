@@ -1,71 +1,86 @@
+/* ===== Styles globaux (chargés sur toutes les pages) ===== */
+
+/* ----- Couleurs du projet I Lost My Cabron -----
+   À utiliser partout avec var(--color-...) au lieu de recopier les codes couleur */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #FEF9F3;
-  --border: none;
-  --code-bg: none;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --color-navy: #072336;          /* bleu marine du logo : titres, textes forts */
+  --color-orange: #DC5C35;        /* orange principal : boutons, liens actifs */
+  --color-orange-light: #FD9D1D;  /* orange clair : accents, survols */
+  --color-orange-dark: #c94f2b;   /* orange foncé : survol des boutons orange */
+  --color-cream: #FEFAF3;         /* fond crème */
+  --color-white: #FFFFFF;
+  --color-muted: #6b6375;         /* texte secondaire */
+  --color-perdu: #dc3545;         /* badge "perdu" */
+  --color-trouve: #c5ad26;        /* badge "trouvé" */
+  --color-error: #dc2626;         /* messages d'erreur */
+  --color-error-dark: #b91c1c;    /* survol des boutons de suppression */
+  --color-success: #16a34a;       /* messages de réussite */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Douceur : arrondis et ombres légères */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-soft: 0 2px 10px rgba(7, 35, 54, 0.06);
+  --shadow-hover: 0 8px 24px rgba(7, 35, 54, 0.10);
 
-  font: 18px/145% var(--sans);
+  /* Couleurs qui changent en mode sombre (voir plus bas) : à utiliser pour les fonds et les textes */
+  --page-bg: var(--color-cream);              /* fond de page */
+  --surface: var(--color-white);              /* cartes, menus, boîtes */
+  --surface-glass: rgba(255, 255, 255, 0.94); /* boîtes posées sur le logo en filigrane */
+  --title-color: var(--color-navy);           /* titres, textes forts */
+  --body-text: #3f4650;                       /* texte courant */
+  --soft-line: rgba(7, 35, 54, 0.08);         /* séparateurs */
+  --soft-fill: rgba(7, 35, 54, 0.05);         /* fonds légers (onglets, zones grisées) */
+  --input-bg: var(--color-white);
+  --input-border: rgba(7, 35, 54, 0.15);
+  --input-text: #3f4650;
+  --input-placeholder: #6b6b6b;
+  --btn-dark: var(--color-navy);              /* boutons foncés (connexion, envoi) */
+  --btn-disabled: rgba(7, 35, 54, 0.35);
+
+  /* Police et couleurs de base */
+  font: 18px/145% system-ui, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  color-scheme: light;
+  color: var(--color-muted);
+  background: var(--page-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  :root {
     font-size: 16px;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: none;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* ----- Mode sombre : activé par le bouton 🌙 (data-theme="dark" sur <html>, voir preferences.jsx) ----- */
+:root[data-theme="dark"] {
+  --page-bg: #16171d;
+  --surface: #1f2128;
+  --surface-glass: rgba(31, 33, 40, 0.94);
+  --title-color: #f3f4f6;
+  --body-text: #c9cdd3;
+  --soft-line: rgba(255, 255, 255, 0.07);
+  --soft-fill: rgba(255, 255, 255, 0.05);
+  --input-bg: #2a2d36;
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-text: #e5e7eb;
+  --input-placeholder: #9ca3af;
+  --btn-dark: #334155;
+  --btn-disabled: rgba(255, 255, 255, 0.15);
+  --color-muted: #9ca3af;
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
 
-
-  .logo_cabron_drk {
-    display: flex;
-    width: 200px;
-    margin-left: 40px;
-  }
-
-  .login {
-    background-color: #a266cf;
-    border-radius: 50%;
-  }
-
-  body {
-    background-color: var(--bg);
-  }
-
+  color-scheme: dark;   /* barres de défilement, champs date, etc. en sombre */
 }
 
 body {
   margin: 0;
-  background-color: var(--bg);
+  background: inherit;
 }
 
 #root {
@@ -79,22 +94,17 @@ body {
   box-sizing: border-box;
 }
 
+/* ----- Titres ----- */
 h1,
 h2 {
-  font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
+  color: var(--title-color);
 }
 
 h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
-
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
 }
 
 h2 {
@@ -102,32 +112,19 @@ h2 {
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
+}
 
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+
+  h2 {
     font-size: 20px;
   }
 }
 
 p {
   margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-.custom-accordion-item {
-  background-color: transparent !important;
-  box-shadow: none;
 }

@@ -1,0 +1,218 @@
+/* ===== Pages de connexion : Login, Register, Guest, GuestLogin, ForgotPassword, ResetPassword, Admin =====
+   Remplace Login.css, Register.css, Guest.css et Admin.css (qui étaient presque identiques).
+   Couleurs : variables --color-... définies dans index.css */
+
+/* ----- Page : fond crème avec le logo en filigrane ----- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 100vh;
+  width: 100%;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: var(--page-bg) url("../assets/Photo_i_lost_my_cabron.jpg") center / auto 70% no-repeat;
+}
+
+/* ----- Boîte du formulaire ----- */
+.auth-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 340px;
+  max-width: 100%;
+  padding: 32px;
+  box-sizing: border-box;
+  background: var(--surface-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  color: var(--title-color);
+}
+
+.auth-box h2 {
+  margin-bottom: 8px;
+  color: var(--title-color);
+}
+
+.auth-box input {
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.auth-box input:focus {
+  outline: none;
+  border-color: var(--color-orange);
+}
+
+.auth-box button {
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--btn-dark);
+  color: var(--color-white);
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-box button:hover {
+  background-color: var(--color-orange);
+}
+
+.auth-box button:disabled {
+  background-color: var(--btn-disabled);
+  cursor: not-allowed;
+}
+
+/* le "ou" entre le formulaire et le bouton Google */
+.auth-or {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* ----- Liens sous le formulaire ----- */
+.auth-link {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.auth-link a {
+  color: var(--title-color);
+}
+
+.auth-link a:hover {
+  color: var(--color-orange);
+}
+
+/* ----- Messages ----- */
+.error-message {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-error);
+}
+
+.success-message {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-success);
+}
+
+/* code de suivi affiché après la création d'un compte invité */
+.tracking-code {
+  margin: 16px 0;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 6px;
+  color: var(--color-orange);
+}
+
+/* ===== Page admin ===== */
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px 40px;
+  box-sizing: border-box;
+  background: var(--page-bg) url("../assets/Photo_i_lost_my_cabron.jpg") left top / 120px auto no-repeat;
+}
+
+.admin-container h2 {
+  margin-bottom: 20px;
+}
+
+.admin-back {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--btn-dark);
+  color: var(--color-white);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.admin-back:hover {
+  background-color: var(--color-orange);
+  color: var(--color-white);
+}
+
+.access-denied {
+  padding: 40px 20px;
+  font-size: 16px;
+  color: var(--color-error);
+}
+
+.admin-table {
+  width: 100%;
+  max-width: 1200px;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--soft-line);
+  font-size: 14px;
+}
+
+.admin-table th {
+  background-color: var(--soft-fill);
+  font-weight: 600;
+  color: var(--title-color);
+}
+
+.admin-table td {
+  color: var(--body-text);
+}
+
+.admin-table tbody tr:hover {
+  background-color: var(--soft-fill);
+}
+
+.delete-button,
+.logout-button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-error);
+  color: var(--color-white);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.delete-button:hover,
+.logout-button:hover {
+  background-color: var(--color-error-dark);
+}
+
+.logout-button {
+  margin-bottom: 20px;
+}
+
+/* ===== Mode sombre : logo en filigrane version sombre ===== */
+:root[data-theme="dark"] .auth-page {
+  background-image: url("../assets/logoCarameloDark.png");
+}
+
+:root[data-theme="dark"] .admin-container {
+  background-image: url("../assets/logoCarameloDark.png");
+}
+
+:root[data-theme="dark"] .auth-box input::placeholder {
+  color: var(--input-placeholder);
+}

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import axios from "axios";
-import "./Register.css";
+import { usePreferences } from "../preferences";
+import "./Auth.css";
 import LoginGoogle from "./LoginGoogle";
- 
+import { API_URL } from "../config";
+
 function Register() {
     // rediriger l'utilisateur :
     const navigate = useNavigate();
-    const [isDark, setIsDark] = useState(
-        window.matchMedia('(prefers-color-scheme : dark)').matches
-    );
+    const { t, tServeur } = usePreferences();
     const [formData, setFormData] = useState({
         surname: "",
         firstname: "",
@@ -17,47 +17,47 @@ function Register() {
         password: "",
         phone_number: "",
     });
- 
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
- 
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
- 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
- 
+
         try {
             const response = await axios.post(
-                "http://localhost:3000/users/register",
+                `${API_URL}/users/register`,
                 formData
             );
             console.log("Utilisateur créé:", response.data);
             navigate("/login");
         } catch (err) {
             if (err.response) {
-                setError(err.response.data.message || "Une erreur est survenue");
+                setError(err.response.data.message || t("auth.erreurGenerique"));
             } else {
-                setError("Impossible de contacter le serveur");
+                setError(t("auth.erreurServeur"));
             }
         } finally {
             setLoading(false);
         }
     };
- 
- 
+
+
     return (
-        <section className="register-container">
-            <form className="register-form" onSubmit={handleSubmit}>
-                <h2>Bienvenu</h2>
-                {error && <p className="error-message">{error}</p>}
+        <section className="auth-page">
+            <form className="auth-box" onSubmit={handleSubmit}>
+                <h2>{t("auth.bienvenue")}</h2>
+                {error && <p className="error-message">{tServeur(error)}</p>}
                 <input
                     type="text"
                     name="firstname"
-                    placeholder="Prénom"
+                    placeholder={t("auth.prenom")}
                     value={formData.firstname}
                     onChange={handleChange}
                     required
@@ -65,7 +65,7 @@ function Register() {
                 <input
                     type="text"
                     name="surname"
-                    placeholder="Nom"
+                    placeholder={t("auth.nom")}
                     value={formData.surname}
                     onChange={handleChange}
                     required
@@ -73,7 +73,7 @@ function Register() {
                 <input
                     type="email"
                     name="email"
-                    placeholder="Email"
+                    placeholder={t("auth.email")}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -81,35 +81,36 @@ function Register() {
                 <input
                     type="password"
                     name="password"
-                    placeholder="Mot de passe"
+                    placeholder={t("auth.mdpMin")}
                     value={formData.password}
                     onChange={handleChange}
+                    minLength={8}
                     required
                 />
                 <input
                     type="tel"
                     name="phone_number"
-                    placeholder="Numéro de téléphone"
+                    placeholder={t("auth.telephone")}
                     value={formData.phone_number}
                     onChange={handleChange}
                     required
                 />
- 
+
                 <button type="submit" disabled={loading}>
-                    {loading ? "Création..." : "S'inscrire"}
+                    {loading ? t("auth.creation") : t("auth.sInscrire")}
                 </button>
-                <p className="connexionGoogle">ou</p>
+                <p className="auth-or">{t("auth.ou")}</p>
                 <LoginGoogle />
-                <p className="login-link">
-                    Déjà un compte ? <Link to="/login">Se connecter</Link>
+                <p className="auth-link">
+                    {t("auth.dejaCompte")} <Link to="/login">{t("auth.seConnecter")}</Link>
                 </p>
-                     
-                <p className="guest-link">
-                    Continuer avec un compte invité ? <Link to="/guest">Compte invité</Link>
+
+                <p className="auth-link">
+                    {t("auth.continuerInvite")} <Link to="/guest">{t("auth.compteInvite")}</Link>
                 </p>
-                <Link to="/welcome" className="link_to_welcome">
-                    Retour à l'accueil
-                </Link>
+                <p className="auth-link">
+                    <Link to="/welcome">{t("auth.retourAccueil")}</Link>
+                </p>
             </form>
         </section>
     );

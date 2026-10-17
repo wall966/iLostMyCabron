@@ -1,101 +1,101 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "./Admin.css";
+import "./Auth.css";
 import { useNavigate, Link } from "react-router";
-
+import { getValidToken, getStoredUser, logout } from "../auth";
+import { usePreferences } from "../preferences";
+import { API_URL } from "../config";
 
 function Admin() {
     const navigate = useNavigate();
+    const { t, tServeur, locale } = usePreferences();
 
     const [users, setUsers] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const token = localStorage.getItem("token");
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
-    const administrator = storedUser && storedUser.profile === "admin";
+    const token = getValidToken();
+    const administrator = Boolean(token) && getStoredUser()?.profile === "admin";
 
-
-    const fetchUsers = async () => {
-        setLoading(true);
-        setError("");
-        try {
-            const response = await axios.get("http://localhost:3000/users", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setUsers(response.data.users);
-        } catch (err) {
-            if (err.response) {
-                setError(err.response.data.message || "Erreur lors du chargement");
-            } else {
-                setError("Impossible de contacter le serveur");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Charge la liste des utilisateurs au chargement de la page
+    // (les messages d'erreur sont des clés de traduction, traduites à l'affichage)
     useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/users`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUsers(response.data.users);
+            } catch (err) {
+                if (err.response) {
+                    setError(err.response.data.message || "admin.erreurChargement");
+                } else {
+                    setError("admin.erreurServeur");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchUsers();
-    }, []);
+    }, [token]);
 
     const handleDelete = async (userId) => {
-        const confirmDelete = window.confirm("Supprimer cet utilisateur définitivement ?");
+        const confirmDelete = window.confirm(t("admin.confirmSuppr"));
         if (!confirmDelete) return;
 
         try {
-            await axios.delete(`http://localhost:3000/users/${userId}`, {
+            await axios.delete(`${API_URL}/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // On retire l'utilisateur supprimé de la liste affichée, sans tout recharger
             setUsers(users.filter((u) => u._id !== userId));
         } catch (err) {
             if (err.response) {
-                setError(err.response.data.message || "Erreur lors de la suppression");
+                setError(err.response.data.message || "admin.erreurSuppr");
             } else {
-                setError("Impossible de contacter le serveur");
+                setError("admin.erreurServeur");
             }
         }
     };
     if (!administrator) {
         return (
             <section className="admin-container">
-                <p className="access-denied">Accès réservé aux administrateurs.</p>
-                <Link to="/welcome" className="go-back-to-welcome">
-                    Retour à l'accueil
+                <p className="access-denied">{t("admin.refuse")}</p>
+                <Link to="/welcome" className="admin-back">
+                    {t("admin.retour")}
                 </Link>
             </section>
         );
     }
-    if (loading) return <p>Chargement...</p>;
+    if (loading) return <p>{t("admin.chargement")}</p>;
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        logout();
         navigate("/welcome");
     };
     return (
-        <section className="admin-container">      
-            <Link to="/account" className="go-back-to-account">
-                Retour à l'accueil
+        <section className="admin-container">
+            <Link to="/account" className="admin-back">
+                {t("admin.retour")}
             </Link>
-            <h2>Gestion des utilisateurs</h2>
+            <h2>{t("admin.titre")}</h2>
 
-            {error && <p className="error-message">{error}</p>}
+            {/* sorti du tableau : un bouton ne peut pas être directement dans un <tr> */}
+            <button onClick={handleLogout} className="logout-button">
+                {t("admin.seDeconnecter")}
+            </button>
+
+            {/* t() renvoie le texte tel quel si ce n'est pas une clé (message du serveur) */}
+            {error && <p className="error-message">{tServeur(t(error))}</p>}
 
             <table className="admin-table">
                 <thead>
                     <tr>
-                        <th>Prénom</th>
-                        <th>Nom</th>
-                        <th>Email</th>
-                        <th>Profil</th>
-                        <th>Action</th>
-                        <th>Dernière connexion</th>
-
-                        <button onClick={handleLogout} className="logout-button">
-                            Se déconnecter
-                        </button>
-
+                        <th>{t("admin.prenom")}</th>
+                        <th>{t("admin.nom")}</th>
+                        <th>{t("admin.email")}</th>
+                        <th>{t("admin.profil")}</th>
+                        <th>{t("admin.action")}</th>
+                        <th>{t("admin.derniereConnexion")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,16 +104,16 @@ function Admin() {
                             <td>{user.firstname || "—"}</td>
                             <td>{user.surname || "—"}</td>
                             <td>{user.email || "—"}</td>
-                            <td>{user.profile}</td>
+                            <td>{t(`compte.types.${user.profile}`)}</td>
                             <td>
                                 <button
                                     className="delete-button"
                                     onClick={() => handleDelete(user._id)}
                                 >
-                                    Supprimer
+                                    {t("admin.supprimer")}
                                 </button>
                             </td>
-                            <td>{user.lastConnection ? new Date(user.lastConnection).toLocaleString('fr-FR') : "Jamais"}</td>
+                            <td>{user.lastConnection ? new Date(user.lastConnection).toLocaleString(locale) : t("admin.jamais")}</td>
                         </tr>
                     ))}
                 </tbody>

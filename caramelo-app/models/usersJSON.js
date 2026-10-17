@@ -69,9 +69,11 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
+    // sparse : sans ça, tous les comptes sans Google ont googleID "vide" et MongoDB refuse le 2e (doublon)
     googleID: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true
     }
 },
     // Permet de ne pas afficher --v : 0 dans mongoDB

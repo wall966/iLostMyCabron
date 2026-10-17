@@ -1,0 +1,89 @@
+/* ===== Réglages : langue + mode clair/sombre (composant Reglages.jsx) =====
+   Même style que le portfolio : pilule FR / EN / PT-BR et icône au trait */
+
+.reglages {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* sur les pages sans header : en haut à droite de l'écran */
+.reglages-flottant {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 1100;
+}
+
+/* ----- Langues : pilule avec la langue active en couleur pleine ----- */
+.reglages-langues {
+    display: flex;
+    gap: 2px;
+    margin: 0;
+    padding: 3px;
+    list-style: none;
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.reglages-langues button {
+    padding: 4px 9px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.reglages-langues button:hover {
+    color: var(--title-color);
+}
+
+.reglages-langues button[aria-pressed="true"] {
+    background: var(--color-navy);
+    color: var(--color-white);
+}
+
+/* en sombre, le marine se verrait mal sur le fond : on passe en orange */
+:root[data-theme="dark"] .reglages-langues button[aria-pressed="true"] {
+    background: var(--color-orange);
+}
+
+/* ----- Bouton thème : simple icône lune / soleil ----- */
+.reglages-theme {
+    display: grid;
+    place-items: center;
+    padding: 4px;
+    border: 0;
+    background: none;
+    color: var(--title-color);
+    cursor: pointer;
+}
+
+.reglages-icone {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s;
+}
+
+.reglages-theme:hover .reglages-icone {
+    transform: rotate(-15deg);
+}
+
+.reglages-langues button:focus-visible,
+.reglages-theme:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+}

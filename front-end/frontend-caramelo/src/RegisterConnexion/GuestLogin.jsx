@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import axios from "axios";
-import "./Guest.css";
+import { saveSession } from "../auth";
+import { usePreferences } from "../preferences";
+import "./Auth.css";
+import { API_URL } from "../config";
 
 function GuestLogin() {
     const navigate = useNavigate();
+    const { t, tServeur } = usePreferences();
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -15,15 +19,14 @@ function GuestLogin() {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:3000/users/guest-login", { code });
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            const response = await axios.post(`${API_URL}/users/guest-login`, { code });
+            saveSession(response.data);
             navigate("/account");
         } catch (err) {
             if (err.response) {
                 setError(err.response.data.message);
             } else {
-                setError("Impossible de contacter le serveur");
+                setError(t("auth.erreurServeur"));
             }
         } finally {
             setLoading(false);
@@ -31,15 +34,15 @@ function GuestLogin() {
     };
 
     return (
-        <section className="guest-container">
-            <form className="guest-box" onSubmit={handleSubmit}>
-                <h2>Retrouver mes annonces</h2>
+        <section className="auth-page">
+            <form className="auth-box" onSubmit={handleSubmit}>
+                <h2>{t("auth.codeTitre")}</h2>
 
-                {error && <p className="error-message">{error}</p>}
+                {error && <p className="error-message">{tServeur(error)}</p>}
 
                 <input
                     type="text"
-                    placeholder="Code de suivi (5 chiffres)"
+                    placeholder={t("auth.codePlaceholder")}
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     maxLength={5}
@@ -47,11 +50,11 @@ function GuestLogin() {
                 />
 
                 <button type="submit" disabled={loading}>
-                    {loading ? "Connexion..." : "Continuer"}
+                    {loading ? t("auth.connexion") : t("auth.continuer")}
                 </button>
 
-                <p className="login-link">
-                    <Link to="/guest">Pas encore de code ? Créer un compte invité</Link>
+                <p className="auth-link">
+                    <Link to="/guest">{t("auth.pasDeCode")}</Link>
                 </p>
             </form>
         </section>

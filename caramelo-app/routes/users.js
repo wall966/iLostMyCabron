@@ -1,17 +1,23 @@
 var express = require('express');
 var router = express.Router();
 
-const jwt = require('jsonwebtoken');
 const User = require('../models/usersJSON');
 const authMiddleware = require('../middlewares/auth');
+const { creerSession, profilPublic } = authMiddleware;
 const admin = require('../middlewares/admin');
 const crypto = require('crypto');
 const sendResetEmail = require('../automatisation/email');
-const { profile } = require('console');
+const rateLimit = require('../middlewares/rateLimit');
+
+// 10 essais par quart d'heure et par IP pour la connexion, le code invité et le mot de passe oublié
+const loginLimiter = rateLimit({ max: 10, windowMs: 15 * 60 * 1000 });
 
 // Route inscription utilisateur
 router.post('/register', async function (req, res) {
   try {
+    if (!req.body.password || req.body.password.length < 8) {
+      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 8 caractères" });
+    }
     const newUser = new User({
       profile: 'utilisateur',
       surname: req.body.surname,
@@ -25,7 +31,8 @@ router.post('/register', async function (req, res) {
 
     res.status(201).json({
       message: "Utilisateur créé",
-      user: newUser
+      // on ne renvoie pas le mot de passe (même hashé)
+      user: profilPublic(newUser)
     });
 
   } catch (error) {
@@ -38,8 +45,11 @@ router.post('/register', async function (req, res) {
 })
 
 // Route connexion utilisateur
-router.post('/login', async function (req, res) {
+router.post('/login', loginLimiter, async function (req, res) {
   try {
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).json({ message: "Email et mot de passe obligatoires" });
+    }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(401).json({ message: "Email ou mot de passe incorrect" })
@@ -53,36 +63,18 @@ router.post('/login', async function (req, res) {
     user.lastConnection = new Date();
     await user.save();
 
-    // Création du token JWT
-    const token = jwt.sign(
-      // Info qu'on veut encoder
-      { id: user._id, profile: user.profile },
-      process.env.JWT_SECRET,
-      // Le token expire après 7 jours
-      { expiresIn: '7d' }
-    );
-
-    res.status(200).json({
-      message: "Connexion réussie",
-      token: token,
-      user: {
-        id: user._id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-        profile: user.profile
-      }
-    });
+    // Création du token JWT (valable 7 jours) + infos utilisateur
+    res.status(200).json({ message: "Connexion réussie", ...creerSession(user) });
   } catch (error) {
     res.status(500).json({ message: "Erreur", error: error.message });
   }
 });
 
-// Route pour le comtpe invité (anonyme)
+// Route pour le compte invité (anonyme)
 
+// génération du code à 5 chiffres qui sera envoyé à la création d'un compte invité
 function generateCode() {
   return Math.floor(10000 + Math.random() * 90000).toString();
-  // génération du code à 5 chiffres qui sera envoyé à la création d'un compte invité
 }
 router.post('/guest', async function (req, res) {
   try {
@@ -98,27 +90,14 @@ router.post('/guest', async function (req, res) {
     });
     await guest.save();
 
-    const token = jwt.sign(
-      { id: guest._id, profile: guest.profile },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    res.status(201).json({
-      message: "Compte invité créé",
-      token: token,
-      user: {
-        id: guest._id,
-        profile: guest.profile,
-        trackingCode: code
-      }
-    });
+    res.status(201).json({ message: "Compte invité créé", ...creerSession(guest) });
   } catch (error) {
     res.status(500).json({ message: "Erreur", error: error.message })
   }
 });
 
 // Route pour se connecter avec le code compte invité
-router.post('/guest-login', async function (req, res) {
+router.post('/guest-login', loginLimiter, async function (req, res) {
   try {
     const user = await User.findOne({
       trackingCode: req.body.code,
@@ -127,20 +106,7 @@ router.post('/guest-login', async function (req, res) {
     if (!user) {
       return res.status(404).json({ message: "Code invalide" });
     }
-    const token = jwt.sign(
-      { id: user._id, profile: user.profile },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    res.status(200).json({
-      message: "Connexion invité réussie",
-      token: token,
-      user: {
-        id: user._id,
-        profile: user.profile,
-        trackingCode: user.trackkingCode
-      }
-    });
+    res.status(200).json({ message: "Connexion invité réussie", ...creerSession(user) });
   } catch (error) {
     res.status(500).json({ message: "Erreur", error: error.message });
   }
@@ -195,7 +161,7 @@ router.delete('/:id', authMiddleware, admin, async function (req, res) {
 });
 
 // Route demande de réinitialisation de mot de passe
-router.post('/forgot-password', async function (req, res) {
+router.post('/forgot-password', loginLimiter, async function (req, res) {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
@@ -223,6 +189,9 @@ router.post('/reset-password/:token', async function (req, res) {
     if (!user) {
       return res.status(400).json({ message: "Lien invalide ou expiré" });
     }
+    if (!req.body.password || req.body.password.length < 8) {
+      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 8 caractères" });
+    }
     user.password = req.body.password;
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
@@ -234,10 +203,5 @@ router.post('/reset-password/:token', async function (req, res) {
   }
 });
 
-
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
-});
 
 module.exports = router;

@@ -1,269 +1,202 @@
-import photoCabron from './assets/Photo_i_lost_my_cabron.jpg';
-import animalWorld from './assets/world-animal-day.png'
 import { Link, useNavigate } from 'react-router';
-import React, { useState, useEffect } from 'react';
-import logoCarameloDrk from './assets/logoCarameloDark.png';
-import "./Account.css";
+import { useState, useEffect } from 'react';
 import axios from "axios";
-import { Card, Accordion, Button, ListGroup } from 'react-bootstrap';
+import SiteHeader, { SiteFooter } from './SiteHeader';
+import { AnimalCard, OngletsStatut } from './Card';
+import { normalise, filtrerParStatut } from './annonces';
+import { getValidToken, logout } from './auth';
+import { usePreferences } from './preferences';
+import "./Site.css";
+import { API_URL } from "./config";
 
 function Account() {
-    const [listPets, setListPets] = useState([]);
-    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [loginOpen, setLoginOpen] = useState(false);
+    const { t, tServeur, locale } = usePreferences();
+    const [listPets, setListPets] = useState([]);
     const [filtrePet, setFiltrePet] = useState("tous");
-    const [displayCard, setDisplayCard] = useState(false);
     const [user, setUser] = useState(null);
-    const [isDark, setIsDark] = useState(
-        window.matchMedia('(prefers-color-scheme : dark)').matches
-    );
+    const [loading, setLoading] = useState(true);
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/welcome");
-    };
+    // Au chargement : on vérifie le token auprès du serveur avant d'afficher quoi que ce soit
+    useEffect(() => {
+        const token = getValidToken();
+        if (!token) {
+            navigate("/login", { replace: true });
+            return;
+        }
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const chargerCompte = async () => {
+            try {
+                const [userResponse, petsResponse] = await Promise.all([
+                    axios.get(`${API_URL}/users/me`, { headers }),
+                    axios.get(`${API_URL}/pets/mine`, { headers }),
+                ]);
+                setUser(userResponse.data.user);
+                setListPets(petsResponse.data);
+            } catch (error) {
+                console.error("Erreur:", error.response?.data || error.message);
+                // 401 = token refusé, 404 = compte supprimé : la session n'est plus valable
+                if ([401, 404].includes(error.response?.status)) {
+                    logout();
+                    navigate("/login", { replace: true });
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        chargerCompte();
+    }, [navigate]);
 
     const handleDeleteAccount = async () => {
-        const confirmed = window.confirm("Êtes-vous sur de vouloir supprimer votre compte ? Cette action est irréversible.");
+        const confirmed = window.confirm(t("compte.confirmSupprCompte"));
         if (!confirmed) return;
         try {
-            const response = await fetch('http://localhost:3000/users/me', {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+            await axios.delete(`${API_URL}/users/me`, {
+                headers: { Authorization: `Bearer ${getValidToken()}` }
             });
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("Votre compte a été supprimé.");
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                navigate("/welcome");
-            } else {
-                alert("Erreur : " + data.message);
-            }
+            alert(t("compte.compteSupprime"));
+            logout();
+            navigate("/welcome");
         } catch (error) {
-            alert("Une erreur est survenue.");
+            alert(t("compte.erreur") + (tServeur(error.response?.data?.message) || t("compte.erreurGenerique")));
         }
     };
 
     const handleDeletePet = async (id) => {
-        const confirmed = window.confirm("Voulez-vous supprimer cette annonce ?");
+        const confirmed = window.confirm(t("compte.confirmSupprAnnonce"));
         if (!confirmed) return;
         try {
-            const token = localStorage.getItem("token");
-            await axios.delete(`http://localhost:3000/pets/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.delete(`${API_URL}/pets/${id}`, {
+                headers: { Authorization: `Bearer ${getValidToken()}` }
             });
             setListPets((prev) => prev.filter((pet) => pet._id !== id));
         } catch (error) {
             console.error("Erreur suppression:", error.response?.data || error.message);
-            alert("Impossible de supprimer cette annonce.");
+            alert(t("compte.impossibleSuppr"));
         }
     };
 
-    const handleEditPet = (id) => {
-        navigate(`/formperdu/${id}`);
+    // Ouvre le bon formulaire selon le statut, sinon un animal trouvé repasserait en "perdu"
+    const handleEditPet = (pet) => {
+        const formulaire = normalise(pet.Status) === "trouve" ? "formtrouve" : "formperdu";
+        navigate(`/${formulaire}/${pet._id}`);
     };
 
-    // darkmode
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme : dark)');
-        const handleChange = (e) => setIsDark(e.matches);
-        mediaQuery.addEventListener('change', handleChange);
+    // Filtre les pets selon l'onglet choisi (deja filtres par Owner via /pets/mine)
+    const petsFiltres = filtrerParStatut(listPets, filtrePet);
 
-        return () => mediaQuery.removeEventListener('change', handleChange);
+    if (loading || !user) {
+        return (
+            <div className="site-page">
+                <SiteHeader />
+                <p className="wp-message">{t("compte.chargement")}</p>
+            </div>
+        );
+    }
 
-    }, []);
+    const isGuest = user.profile === "anonyme";
+    const nomComplet = `${user.firstname || ""} ${user.surname || ""}`.trim();
+    const initiale = isGuest ? "?" : (user.firstname || "?").charAt(0).toUpperCase();
+    const typeCompte = t(`compte.types.${user.profile}`);
 
-    useEffect(() => {
-        const chercherPets = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get("http://localhost:3000/pets/mine", {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                setListPets(response.data);
-            } catch (error) {
-                console.error("Erreur:", error.response?.data || error.message);
-            }
-        };
-        chercherPets();
-    }, []);
+    return (
+        <div className="site-page">
+            <SiteHeader />
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
+            <main className="wp-content account-page">
+                {/* Fiche membre */}
+                <aside className="acc-card">
+                    <div className="acc-card-body">
+                        <div className="acc-card-id">
+                            <div className="acc-avatar" aria-hidden="true">{initiale}</div>
+                            <div>
+                                <p className="acc-name">{isGuest ? t("compte.bienvenue") : t("compte.bonjour", { nom: user.firstname })}</p>
+                                <p className="acc-type">{typeCompte}</p>
+                            </div>
+                        </div>
 
-    // Filtre les pets selon le statut choisi dans le menu (deja filtres par Owner via /pets/mine)
-    const normalise = (str) => (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const petsFiltres = listPets.filter((pet) => {
-        if (filtrePet === "tous") return true;
-        return normalise(pet.Status) === normalise(filtrePet);
-    });
+                        <dl className="acc-fields">
+                            {!isGuest && (
+                                <div><dt>{t("compte.nom")}</dt><dd>{nomComplet}</dd></div>
+                            )}
+                            {user.email && (
+                                <div><dt>{t("compte.email")}</dt><dd>{user.email}</dd></div>
+                            )}
+                            {user.phone_number && (
+                                <div><dt>{t("compte.telephone")}</dt><dd>{user.phone_number}</dd></div>
+                            )}
+                            {user.creation_date && (
+                                <div><dt>{t("compte.inscritLe")}</dt><dd>{new Date(user.creation_date).toLocaleDateString(locale)}</dd></div>
+                            )}
+                            <div><dt>{t("compte.annonces")}</dt><dd>{listPets.length}</dd></div>
+                        </dl>
 
-    return (<>
-        <div className='Welcome'>
-            <header className="Top">
+                        {isGuest && user.trackingCode && (
+                            <div className="acc-tracking">
+                                <span>{t("compte.codeSuivi")}</span>
+                                <strong>{user.trackingCode}</strong>
+                                <small>{t("compte.notezLe")}</small>
+                            </div>
+                        )}
 
-                {isDark ? (
-                    <img src={logoCarameloDrk} className="logo_cabron_drk" alt="Logo Cabron dark" />
-                ) : (
-                    <img src={photoCabron} className="logo_cabron" alt="Logo Cabron" />
-                )}
-
-                <button type='button' className='menu' onClick={() => {
-                    setMenuOpen(!menuOpen)
-                }}>Menu</button>
-
-                {/* Button pour donner acess aux deux formulaires perdu/trouve */}
-                <ul className={`dropside-menu ${menuOpen ? "open" : ""}`}>
-                    <li> <button
-                        className="logout"
-                        onClick={() => {
-                            setDisplayCard(true);
-                            setFiltrePet("tous");
-                        }}
-                    >
-                            Voir tous les animaux
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            className="logout"
-                            onClick={() => {
-                                setDisplayCard(true);
-                                setFiltrePet("trouve");
-                            }}
-                        >
-                            Voir tous les animaux trouvés
-                        </button>
-                    </li>
-                    <li>
-                        <button className="logout"
-                            onClick={() => {
-                                setDisplayCard(true);
-                                setFiltrePet("perdu");
-                            }}
-                        > Voir tous les animaux perdus</button>
-                    </li>
-
-                    <li style={{ position: "relative" }}>
-                        <button className="logout" onClick={() => setOpen(!open)} > Poster une annonce </button>
-                    </li>
-                    {open && (
-                        <ul style={{ position: "absolute", left: "100%", top: 100, listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
-                            <li>
-                                <button className="logout" onClick={() => navigate("/FormPerdu")}>Animal perdu</button>
-                            </li>
-                            <hr style={{ width: "100%" }} />
-                            <li>
-                                <button className="logout" onClick={() => navigate("/FormTrouve")}>Animal trouvé </button>
-                            </li>
-                        </ul>
-                    )}
-                    <li>
-                        <button className='logout' onClick={() => navigate("/account")}> Voir mes annonces</button>
-                    </li>
-                </ul>
-                <br/>
-                <section>
-                    <ul className="navBarBtn">
-                        <li>
-                            <Link to="/about">A propos de nous</Link>
-                        </li>
-                        <li>
-                            <Link to="/services">Services</Link>
-                        </li>
-                        <li>
-                            <Link to="/contact">Contact</Link>
-                        </li>
-                    </ul>
-                </section>
-
-              
-
-            </header>
-
-            <aside>
-                <img src={animalWorld} className="login" alt="Sign up / in" onClick={() => {
-                    setLoginOpen(!loginOpen)
-                }} />
-                <ul className={`dropdown-login ${loginOpen ? "open" : ""}`}>
-                    <li>
-                        <button onClick={handleLogout} className="logout">Se deconnecter</button>
-                    </li>
-                    <li>
-                        <button onClick={handleDeleteAccount} className="delete-account">Supprimer mon compte</button>
-                    </li>
-                </ul>
-            </aside>
-
-            <main className="account-content">
-                {user && (
-                <h1>
-                    Bienvenue {user.firstname} !
-                </h1>
-                )}
-
-                {petsFiltres.length === 0 ? (
-                    <p className="no-annonce">Vous n'avez pas encore publié d'annonce..</p>
-                ) : (
-                    <div className="cards-row">
-                        {petsFiltres.map((animal) => (
-                            <Card className="animal-card" key={animal._id}>
-                                <div className="card-img-wrapper">
-                                    <Card.Img variant="top" src={animal.Photo} />
-                                    <span className={`status-badge ${animal.Status === 'perdu' ? 'status-perdu' : 'status-trouve'}`}>
-                                        {animal.Status}
-                                    </span>
-                                </div>
-                                <Card.Body className="animal-card-body">
-                                    <Card.Title>{animal.Name}</Card.Title>
-
-                                    <ListGroup className="list-group-flush">
-                                        <ListGroup.Item>{animal.Breed}</ListGroup.Item>
-                                        <ListGroup.Item>Date et heure : {animal.Date_time}</ListGroup.Item>
-                                        <ListGroup.Item>Localisation : {animal.GPS_coordinates}</ListGroup.Item>
-                                    </ListGroup>
-
-                                    <Accordion className="mt-2">
-                                        <Accordion.Item eventKey="0">
-                                            <Accordion.Header>Voir la description</Accordion.Header>
-                                            <Accordion.Body>
-                                                {animal.Description}
-                                            </Accordion.Body>
-                                        </Accordion.Item>
-                                    </Accordion>
-
-                                  <div className="card-actions mt-2 d-flex gap-2">
-                                    <button className="edit-pet" onClick={() => handleEditPet(animal._id)}>
-                                        Modifier
-                                    </button>
-                                    <button className="delete-pet" onClick={() => handleDeletePet(animal._id)}>
-                                        Supprimer
-                                    </button>
-                                </div>
-                                </Card.Body>
-                            </Card>
-                        ))}
+                        {user.profile === "admin" && (
+                            <Link to="/admin" className="acc-link">{t("compte.espaceAdmin")}</Link>
+                        )}
                     </div>
-                )}
+                    <button type="button" className="acc-delete" onClick={handleDeleteAccount}>
+                        {t("compte.supprimerCompte")}
+                    </button>
+                </aside>
+
+                {/* Mes annonces */}
+                <section className="acc-section">
+                    <div className="wp-section-head">
+                        <h1>{t("compte.mesAnnonces")}</h1>
+                        <div className="acc-section-actions">
+                            <button type="button" className="wp-btn wp-btn-primary" onClick={() => navigate("/formperdu")}>
+                                {t("compte.plusPerdu")}
+                            </button>
+                            <button type="button" className="wp-btn wp-btn-secondary" onClick={() => navigate("/formtrouve")}>
+                                {t("compte.plusTrouve")}
+                            </button>
+                        </div>
+                    </div>
+
+                    {listPets.length > 0 && (
+                        <div className="acc-tabs">
+                            <OngletsStatut valeur={filtrePet} onChange={setFiltrePet} />
+                        </div>
+                    )}
+
+                    {petsFiltres.length === 0 ? (
+                        <div className="cards-empty">
+                            <p>
+                                {listPets.length === 0
+                                    ? t("compte.aucunePubliee")
+                                    : t("compte.aucuneCategorie")}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="cards-row">
+                            {petsFiltres.map((animal) => (
+                                <AnimalCard key={animal._id} animal={animal}>
+                                    <button className="acc-card-btn" onClick={() => handleEditPet(animal)}>
+                                        {t("compte.modifier")}
+                                    </button>
+                                    <button className="acc-card-btn acc-card-btn-danger" onClick={() => handleDeletePet(animal._id)}>
+                                        {t("compte.supprimer")}
+                                    </button>
+                                </AnimalCard>
+                            ))}
+                        </div>
+                    )}
+                </section>
             </main>
 
+            <SiteFooter />
         </div>
-
-    </>
-    )
+    );
 }
 
-export default Account
+export default Account;

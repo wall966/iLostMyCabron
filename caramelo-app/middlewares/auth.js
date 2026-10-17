@@ -22,5 +22,29 @@ function authMiddleware(req, res, next) {
     }
 }
 
+// Infos utilisateur renvoyées au front (jamais le mot de passe)
+function profilPublic(user) {
+    return {
+        id: user._id,
+        firstname: user.firstname,
+        surname: user.surname,
+        email: user.email,
+        profile: user.profile,
+        trackingCode: user.trackingCode
+    };
+}
+
+// Crée le token de connexion (valable 7 jours) + les infos utilisateur.
+// Utilisé par la connexion classique, invité et Google.
+function creerSession(user) {
+    const token = jwt.sign(
+        { id: user._id, profile: user.profile },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+    );
+    return { token, user: profilPublic(user) };
+}
 
 module.exports = authMiddleware;
+module.exports.profilPublic = profilPublic;
+module.exports.creerSession = creerSession;

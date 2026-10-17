@@ -1,68 +1,56 @@
+/* ===== Formulaires "animal perdu" et "animal trouvé" =====
+   Couleurs : variables --color-... définies dans index.css */
+
 .perdu-container {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  background-color: #FEFAF3;
-  background-image: url("../assets/Photo_i_lost_my_cabron.jpg");
-  background-size: 45%;
-  background-repeat: no-repeat;
-  background-position: center;
   padding: 2rem 1rem;
+  box-sizing: border-box;
+  background: var(--page-bg) url("../assets/Photo_i_lost_my_cabron.jpg") center / auto 70% no-repeat;
 }
 
-/* ── Carte élargie ── */
+/* ----- Carte du formulaire ----- */
 .perdu-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 36px 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
   width: 480px;
   max-width: 95vw;
+  padding: 36px 40px;
+  box-sizing: border-box;
+  background: var(--surface-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
-.perdu-form h2 {
+.perdu-form h3 {
   text-align: center;
-  margin-bottom: 8px;
-  font-size: 1.2rem;
-  color: #072336;
+  color: var(--title-color);
 }
 
-/* ── Inputs, select, textarea ── */
+/* ----- Champs ----- */
 .perdu-form input[type="text"],
-.perdu-form input[type="date"],
-.perdu-form input[type="time"],
 .perdu-form select,
 .perdu-form textarea {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: inherit;
   width: 100%;
   box-sizing: border-box;
-  background: #fff;
-  color: #5c5a5a;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 14px;
+  font-family: inherit;
   text-align: center;
 }
 
 .perdu-form input::placeholder,
 .perdu-form textarea::placeholder {
-  color: #555;
+  color: var(--input-placeholder);
   opacity: 1;
-}
-
-.perdu-form input[type="number"]::-webkit-inner-spin-button,
-.perdu-form input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.perdu-form input[type="number"] {
-  -moz-appearance: textfield;
 }
 
 .perdu-form textarea {
@@ -74,88 +62,76 @@
 .perdu-form select:focus,
 .perdu-form textarea:focus {
   outline: none;
-  border-color: #072336;
+  border-color: var(--color-orange);
 }
 
-.input-error {
-  border-color: #dc2626 !important;
+.perdu-form .input-error {
+  border-color: var(--color-error);
 }
 
-.error-message {
-  color: #dc2626;
-  font-size: 13px;
+.perdu-form .error-message {
   margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--color-error);
 }
 
-/* ── Labels ── */
+/* conseil affiché quand l'animal trouvé n'a pas vu de vétérinaire */
+.info-message {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
 .field-label {
   display: block;
-  font-size: 11px;
-  color: #444;
   margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 600;
+  color: var(--body-text);
 }
 
-/* ── Date + Heure côte à côte ── */
-.row-two {
-  display: flex;
-  gap: 12px;
-}
-
-.row-two .datetime-block {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* ── Bloc lieu ── */
+.datetime-block,
 .lieu-block {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.lieu-block .field-label {
-  margin-bottom: 0;
-}
-
-/* ── Bouton GPS ── */
+/* ----- Bouton "Ma position actuelle" ----- */
 .btn-gps {
-  padding: 9px 12px;
-  margin-top: 2px;
-  background: none;
-  border: 1px solid #072336;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #072336;
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.18s, color 0.18s;
   width: 100%;
+  margin-top: 2px;
+  padding: 9px 12px;
+  border: 1px solid var(--title-color);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--title-color);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
 .btn-gps:hover {
-  background: #072336;
-  color: #fff;
+  background: var(--btn-dark);
+  color: var(--color-white);
 }
 
-/* ── Radio blocks ── */
+/* ----- Boutons radio (vaccination, vétérinaire) ----- */
 .radio-block {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   padding: 9px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #fff;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
 }
 
 .radio-label {
-  color: #8d8b8b;
-  font-family: inherit;
+  color: var(--input-placeholder);
   font-size: 16px;
 }
 
@@ -169,55 +145,53 @@
   align-items: center;
   gap: 5px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--input-text);
   cursor: pointer;
 }
 
 .radio-group input[type="radio"] {
-  accent-color: #f10808;
-  cursor: pointer;
   width: auto;
-}
-
-/* ── Input file ── */
-.input-file {
-  text-align: center;
-  font-size: 13px;
-  color: #646262;
-  padding: 6px 0;
-  border: none !important;
-  background: transparent !important;
+  accent-color: var(--color-orange);
   cursor: pointer;
-  width: 100%;
 }
 
-/* ── Bouton submit ── */
+/* ----- Photo ----- */
+.perdu-form .input-file {
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--body-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ----- Bouton d'envoi ----- */
 .btn-submit {
   display: block;
   width: 70%;
   margin: 8px auto 0;
   padding: 12px;
-  background-color: #072336;
-  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  background-color: var(--btn-dark);
+  color: var(--color-white);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  text-align: center;
   transition: background 0.2s;
 }
 
 .btn-submit:hover {
-  background-color: #0f3d5c;
+  background-color: var(--color-orange);
 }
 
 .btn-submit:disabled {
-  background-color: #c6d0db;
+  background-color: var(--btn-disabled);
   cursor: not-allowed;
 }
 
-/* ── Floating label ── */
+/* ----- Champs avec étiquette qui remonte quand on écrit ----- */
 .floating-label {
   position: relative;
   width: 100%;
@@ -228,10 +202,11 @@
 .floating-label input {
   width: 100%;
   padding: 1rem 0.75rem 0.5rem;
-  border: 1px solid #f7f0f0;
-  border-radius: 4px;
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
   font-size: 1rem;
-  background: white;
   outline: none;
   box-sizing: border-box;
 }
@@ -241,33 +216,47 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
+  padding: 0 4px;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: var(--input-bg);
   font-size: 1rem;
-  color: #979595;
+  color: var(--input-placeholder);
   pointer-events: none;
   transition: all 0.2s ease;
-  background: white;
-  padding: 0 4px;
 }
 
 .floating-label input:focus + label,
 .floating-label input:not(:placeholder-shown) + label {
   top: 0;
   font-size: 0.75rem;
-  color: rgb(117, 117, 117);
-  transform: translateY(-50%);
+  color: var(--input-placeholder);
 }
 
-h3 {
-  color: #0f3d5c;
+/* ----- Calendrier MUI (date et heure) : boutons à taille normale ----- */
+.MuiPickersDay-root,
+.MuiPickersArrowSwitcher-button,
+.MuiIconButton-root,
+.MuiDialogActions-root button {
+  margin-top: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 6px 16px !important;
 }
 
-/* ── Responsive mobile ── */
+.perdu-form .MuiFormControl-root {
+  width: 100%;
+}
+
 @media (max-width: 560px) {
   .perdu-form {
-    width: 95vw;
     padding: 24px 16px;
   }
-  .row-two {
-    flex-direction: column;
-  }
+}
+
+/* ===== Mode sombre : logo en filigrane version sombre ===== */
+:root[data-theme="dark"] .perdu-container {
+  background-image: url("../assets/logoCarameloDark.png");
 }

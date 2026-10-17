@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import axios from "axios";
-import "./Login.css";
+import { usePreferences } from "../preferences";
+import "./Auth.css";
+import { API_URL } from "../config";
 
 function ForgotPassword() {
+    const { t, tServeur } = usePreferences();
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
@@ -17,39 +20,39 @@ function ForgotPassword() {
 
         try {
             const response = await axios.post(
-                "http://localhost:3000/users/forgot-password",
+                `${API_URL}/users/forgot-password`,
                 { email }
             );
             setMessage(response.data.message);
-        } catch (err) {
-            setError("Impossible de contacter le serveur");
+        } catch {
+            setError(t("auth.erreurServeur"));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <section className="login-container">
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h2>Mot de passe oublié</h2>
+        <section className="auth-page">
+            <form className="auth-box" onSubmit={handleSubmit}>
+                <h2>{t("auth.oublieTitre")}</h2>
 
-                {message && <p className="success-message">{message}</p>}
-                {error && <p className="error-message">{error}</p>}
+                {message && <p className="success-message">{tServeur(message)}</p>}
+                {error && <p className="error-message">{tServeur(error)}</p>}
 
                 <input
                     type="email"
-                    placeholder="Votre email"
+                    placeholder={t("auth.votreEmail")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
 
                 <button type="submit" disabled={loading}>
-                    {loading ? "Envoi..." : "Envoyer le lien"}
+                    {loading ? t("auth.envoi") : t("auth.envoyerLien")}
                 </button>
 
-                <p className="login-link">
-                    <Link to="/login">Retour à la connexion</Link>
+                <p className="auth-link">
+                    <Link to="/login">{t("auth.retourConnexion")}</Link>
                 </p>
             </form>
         </section>

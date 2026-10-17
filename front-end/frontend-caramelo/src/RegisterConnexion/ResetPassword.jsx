@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import axios from "axios";
-import "./Login.css";
+import { usePreferences } from "../preferences";
+import "./Auth.css";
+import { API_URL } from "../config";
 
 function ResetPassword() {
     const { token } = useParams();
     const navigate = useNavigate();
+    const { t, tServeur } = usePreferences();
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -19,7 +22,7 @@ function ResetPassword() {
 
         try {
             const response = await axios.post(
-                `http://localhost:3000/users/reset-password/${token}`,
+                `${API_URL}/users/reset-password/${token}`,
                 { password }
             );
             setSuccess(response.data.message);
@@ -28,34 +31,35 @@ function ResetPassword() {
             if (err.response) {
                 setError(err.response.data.message);
             } else {
-                setError("Impossible de contacter le serveur");
+                setError(t("auth.erreurServeur"));
             }
         } finally {
             setLoading(false);
         }
     };
     return (
-        <section className="login-container">
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h2>Nouveau mot de passe</h2>
+        <section className="auth-page">
+            <form className="auth-box" onSubmit={handleSubmit}>
+                <h2>{t("auth.resetTitre")}</h2>
 
-                {success && <p className="success-message">{success}</p>}
-                {error && <p className="error-message">{error}</p>}
+                {success && <p className="success-message">{tServeur(success)}</p>}
+                {error && <p className="error-message">{tServeur(error)}</p>}
 
                 <input
                     type="password"
-                    placeholder="Nouveau mot de passe"
+                    placeholder={t("auth.nouveauMdp")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    minLength={8}
                     required
                 />
 
                 <button type="submit" disabled={loading}>
-                    {loading ? "Réinitialisation..." : "Réinitialiser"}
+                    {loading ? t("auth.reinitialisation") : t("auth.reinitialiser")}
                 </button>
 
-                <p className="login-link">
-                    <Link to="/login">Retour à la connexion</Link>
+                <p className="auth-link">
+                    <Link to="/login">{t("auth.retourConnexion")}</Link>
                 </p>
             </form>
         </section>

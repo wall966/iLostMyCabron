@@ -32,46 +32,14 @@ const PetsSchema = new mongoose.Schema({
 const Pets = mongoose.model('pets', PetsSchema)
 
 
-/* Pour faire la triage de animal perdu */
-router.get('/pets/perdu', async (req, res) => {
-    try {
-        const data = await Pets.find({ Status: 'perdu' });
-        if (!data) {
-            return res.status(404).json({
-                message: "Pet non trouvé"
-            })
-        }
-        res.json(data);
-    } catch (err) {
-        res.status(500).json({ erro: err.message });
-    }
-});
-/* Pour faire la triage de animal trouvé */
-router.get('/pets/trouve', async (req, res) => {
-    try {
-        const data = await Pets.find({ Status: 'trouvé' });
-        if (!data) {
-            return res.status(404).json({
-                message: "Pet non trouvé"
-            })
-        }
-        res.json(data);
-    } catch (err) {
-        res.status(500).json({ erro: err.message });
-    }
-});
 /* CRUD pour recuperer seulement les animaux avec le mem ID du user */
 router.get('/pets/mine',authMiddleware, async (req, res) => {
     try {
+        // liste vide = pas encore d'annonce (pas une erreur)
         const data = await Pets.find({Owner: req.user.id});
-        if (data.length===0) {
-            return res.status(404).json({
-                message: "Pet non trouvé"
-            })
-        }
         res.json(data);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -83,7 +51,7 @@ router.post('/pets',authMiddleware, async (req, res) => {
         const data = await pet.save();
         res.status(201).json(data);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -91,16 +59,9 @@ router.post('/pets',authMiddleware, async (req, res) => {
 router.get('/pets', async (req, res) => {
     try {
         const data = await Pets.find();
-
-
-        if (!data.length) {
-            return res.status(404).json({
-                message: "Aucune pet trouve avec notre recherche"
-            });
-        }
         res.json(data);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -108,7 +69,8 @@ router.get('/pets', async (req, res) => {
 router.get('/pets/:id', async (req, res) => {
     try {
 
-        const data = await Pets.findById(req.params.id);
+        // un identifiant mal formé = annonce introuvable (et non une erreur serveur)
+        const data = mongoose.isValidObjectId(req.params.id) && await Pets.findById(req.params.id);
 
         if (!data) {
             return res.status(404).json({
@@ -117,41 +79,50 @@ router.get('/pets/:id', async (req, res) => {
         }
         res.json(data);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
-/* CRUD actualiser pet (UPDATE)*/
-router.put('/pets/:id', async (req, res) => {
+/* Vérifie que la personne connectée est bien celle qui a créé l'annonce (ou un admin) */
+async function findOwnPet(req, res) {
+    const pet = mongoose.isValidObjectId(req.params.id) && await Pets.findById(req.params.id);
+    if (!pet) {
+        res.status(404).json({ message: "Pet non trouvé" });
+        return null;
+    }
+    if (String(pet.Owner) !== String(req.user.id) && req.user.profile !== 'admin') {
+        res.status(403).json({ message: "Vous ne pouvez modifier que vos propres annonces" });
+        return null;
+    }
+    return pet;
+}
+
+/* CRUD actualiser pet (UPDATE), réservé au propriétaire de l'annonce */
+router.put('/pets/:id', authMiddleware, async (req, res) => {
     try {
-        const data = await Pets.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true })
-        if (!data) {
-            return res.status(404).json({
-                message: "Aucune pet trouve avec notre recherche"
-            });
-        }
+        const pet = await findOwnPet(req, res);
+        if (!pet) return;
+
+        // on empêche de changer le propriétaire ou l'identifiant de l'annonce
+        const { _id, Owner, ...changes } = req.body;
+        pet.set(changes);
+        const data = await pet.save();
         res.json(data);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
-/*CRUD delete une pet(DELETE) */
-router.delete('/pets/:id', async (req, res) => {
+/*CRUD delete une pet(DELETE), réservé au propriétaire de l'annonce */
+router.delete('/pets/:id', authMiddleware, async (req, res) => {
     try {
-        const data = await Pets.findByIdAndDelete(req.params.id);
+        const pet = await findOwnPet(req, res);
+        if (!pet) return;
 
-        if (!data) {
-            return res.status(404).json({
-                message: "Pet non trouvé"
-            });
-        }
-        res.json(data);
+        await pet.deleteOne();
+        res.json(pet);
     } catch (err) {
-        res.status(500).json({ erro: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 

@@ -2,37 +2,28 @@
 require('dotenv').config();
 
 var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 
 /* Ajoute de la  bibliothèque Mongoose(au lieu de Monk) */
 const mongoose = require('mongoose');
 
-var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var User = require('./models/usersJSON');
-var annoncesRouter = require('./routes/annonces');
-var petJSON = require('./models/petJSON');
-var app = express();
+var petsRouter = require('./models/petJSON');
 const authRoutes = require('./routes/loginGoogle');
+var app = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// Adresse du site autorisée à appeler l'API : FRONTEND_URL du .env (en ligne), sinon le front local
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173", credentials: true }));
+// En ligne, l'hébergeur passe par un proxy : sans ça, req.ip serait le même pour tout le monde (voir rateLimit.js)
+app.set('trust proxy', 1);
 app.use(logger('dev'));
 app.use(express.json());
-app.use(cors());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use('/api/auth', authRoutes);
-
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/annonces', annoncesRouter);
-app.use('/', petJSON);
+app.use('/', petsRouter);
 
 /*Connection du Back-end avec la base de donnes(MongoDB) (verifier le fichier(.env)*/
 const mongoURI = process.env.MONGO_URI;

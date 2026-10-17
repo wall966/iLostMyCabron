@@ -1,41 +1,43 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import axios from "axios";
-import "./Login.css";
-import cabron from "../assets/Photo_i_lost_my_cabron.jpg";
+import { saveSession } from "../auth";
+import { usePreferences } from "../preferences";
+import "./Auth.css";
 import LoginGoogle from "./LoginGoogle";
- 
+import { API_URL } from "../config";
+
 function Login() {
     // rediriger l'utilisateur :
     const navigate = useNavigate();
- 
+    const { t, tServeur } = usePreferences();
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
- 
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
- 
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
- 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
- 
+
         try {
             const response = await axios.post(
-                "http://localhost:3000/users/login",
+                `${API_URL}/users/login`,
                 formData
             );
-           
+
             console.log("Utilisateur connecté:", response.data);
             // Stocke le token et les infos pour garder la session
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            saveSession(response.data);
             //  Page de destination après connection
             if (response.data.user.profile === 'admin') {
                 navigate("/admin");
@@ -44,27 +46,27 @@ function Login() {
             }
         } catch (err) {
             if (err.response) {
-                setError(err.response.data.message || "Une erreur est survenue");
+                setError(err.response.data.message || t("auth.erreurGenerique"));
             } else {
-                setError("Impossible de contacter le serveur");
+                setError(t("auth.erreurServeur"));
             }
         } finally {
             setLoading(false);
         }
     };
- 
- 
+
+
     return (
-        <section className="login-container">
- 
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h2>Bienvenue</h2>
-                {error && <p className="error-message">{error}</p>}
- 
+        <section className="auth-page">
+
+            <form className="auth-box" onSubmit={handleSubmit}>
+                <h2>{t("auth.bienvenue")}</h2>
+                {error && <p className="error-message">{tServeur(error)}</p>}
+
                 <input
                     type="email"
                     name="email"
-                    placeholder="Email"
+                    placeholder={t("auth.email")}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -72,26 +74,26 @@ function Login() {
                 <input
                     type="password"
                     name="password"
-                    placeholder="Mot de passe"
+                    placeholder={t("auth.motDePasse")}
                     value={formData.password}
                     onChange={handleChange}
                     required
                 />
- 
+
                 <button type="submit" disabled={loading}>
-                    {loading ? "Connexion..." : "Se connecter"}
+                    {loading ? t("auth.connexion") : t("auth.seConnecter")}
                 </button>
-                <p className="connexionGoogle">ou</p>
+                <p className="auth-or">{t("auth.ou")}</p>
                 <LoginGoogle />
-                <p className="login-link">
-                    <Link to="/forgot-password">Mot de passe oublié ?</Link>
+                <p className="auth-link">
+                    <Link to="/forgot-password">{t("auth.mdpOublie")}</Link>
                 </p>
-                <p className="register-link">
-                    Pas encore de compte? <Link to="/register">Créer un compte</Link>
+                <p className="auth-link">
+                    {t("auth.pasDeCompte")} <Link to="/register">{t("auth.creerCompte")}</Link>
                 </p>
-                <Link to="/welcome" className="link_to_welcome">
-                    Retour à l'accueil
-                </Link>
+                <p className="auth-link">
+                    <Link to="/welcome">{t("auth.retourAccueil")}</Link>
+                </p>
             </form>
         </section>
     );

@@ -1,10 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
-import './App.css'
-import Home from "./home";
-import Welcome from "./welcome";
+import Home from "./Home";
+import Welcome from "./Welcome";
 import About from './About';
-import Contact from './Contact';
-import Services from './Services';
+import EnConstruction from './EnConstruction';
 import Register from './RegisterConnexion/Register';
 import Login from './RegisterConnexion/Login';
 import Guest from './RegisterConnexion/Guest';
@@ -13,14 +11,16 @@ import Account from './Account';
 import ForgotPassword from './RegisterConnexion/ForgotPassword';
 import ResetPassword from './RegisterConnexion/ResetPassword';
 import GuestLogin from './RegisterConnexion/GuestLogin';
-import LoginGoogle from './RegisterConnexion/LoginGoogle';
 import FormPerdu from './Formulaires/FormPerdu';
 import FormTrouve from './Formulaires/FormTrouve';
+import { ReglagesFlottants } from './Reglages';
 
 function App() {
 
   return (
     <BrowserRouter>
+      {/* langue + mode sombre en haut à droite sur les pages sans header */}
+      <ReglagesFlottants />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/welcome" element={<Welcome />} />
@@ -29,18 +29,16 @@ function App() {
         <Route path="/guest" element={<Guest />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/about" element={<About />} />
-        <Route path ="/services" element={<Services />} />
-        <Route path='/contact' element={<Contact />} />
+        <Route path="/services" element={<EnConstruction cleTitre="header.services" />} />
+        <Route path="/contact" element={<EnConstruction cleTitre="header.contact" />} />
         <Route path="/account" element={<Account />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/guest-login" element={<GuestLogin />} />
-        <Route path="/about" element={<About />} />
         <Route path="/formperdu" element={<FormPerdu />} />
         <Route path="/formperdu/:id" element={<FormPerdu />} />
         <Route path="/formtrouve" element={<FormTrouve />} />
         <Route path="/formtrouve/:id" element={<FormTrouve />} />
-        <Route path="/LoginGoogle" element={<LoginGoogle />} />
       </Routes>
     </BrowserRouter>
   )

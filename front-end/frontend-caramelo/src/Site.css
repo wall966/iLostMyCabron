@@ -1,0 +1,934 @@
+/* ===== Pages avec le header du site : accueil (/welcome), compte (/account), à propos (/about),
+   contact et services (EnConstruction) =====
+   Les couleurs viennent des variables --color-... définies dans index.css.
+   Style doux : couleurs pleines (pas de dégradé), coins arrondis, ombres légères.
+   Tout est rangé sous .site-page pour ne pas toucher aux autres pages.
+   Les couleurs du mode sombre (--page-bg, --surface, --title-color...) sont dans index.css. */
+
+.site-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--page-bg);
+    color: var(--body-text);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.site-page .c-orange {
+    color: var(--color-orange);
+}
+
+/* ----- Header ----- */
+.site-page .wp-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 10px 40px;
+    background: var(--page-bg);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .wp-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+/* le logo a une forme de pin (pointe en bas) : on l'affiche en entier, sans le recadrer */
+.site-page .wp-logo {
+    height: 54px;
+    width: auto;
+    object-fit: contain;
+}
+
+.site-page .wp-brand-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--title-color);
+}
+
+.site-page .wp-nav {
+    display: flex;
+    gap: 6px;
+}
+
+.site-page .wp-nav a {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--title-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.site-page .wp-nav a:hover,
+.site-page .wp-nav a.active {
+    background: rgba(220, 92, 53, 0.1);
+    color: var(--color-orange);
+}
+
+.site-page .wp-search {
+    flex: 1;
+    max-width: 380px;
+    margin-left: auto;
+}
+
+.site-page .wp-spacer {
+    flex: 1;
+}
+
+.site-page .wp-search .MuiAutocomplete-root {
+    border-radius: var(--radius-md);
+    border-color: var(--soft-line);
+    background: var(--surface);
+    color: var(--title-color);
+    box-shadow: none;
+}
+
+.site-page .wp-search .MuiAutocomplete-input {
+    color: var(--title-color);
+}
+
+.site-page .wp-search .MuiAutocomplete-input::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+}
+
+/* ----- Bouton compte + menu ----- */
+.site-page .wp-login {
+    position: relative;
+}
+
+.site-page .wp-account-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px 5px 5px;
+    border: none;
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--title-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.2s;
+}
+
+.site-page .wp-account-btn:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.site-page .wp-account-btn img {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border-radius: 50%;
+    background: var(--color-orange-light);
+}
+
+.site-page .wp-login-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    min-width: 210px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-hover);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.site-page .wp-login-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.site-page .wp-login-menu a,
+.site-page .wp-login-menu button {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: none;
+    text-align: left;
+    font: inherit;
+    color: var(--title-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.site-page .wp-login-menu a:hover,
+.site-page .wp-login-menu button:hover {
+    background: rgba(220, 92, 53, 0.1);
+    color: var(--color-orange);
+}
+
+/* ----- Boutons ----- */
+.site-page .wp-btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.site-page .wp-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+}
+
+.site-page .wp-btn-primary {
+    background: var(--color-orange);
+    color: var(--color-white);
+}
+
+.site-page .wp-btn-primary:hover {
+    background: var(--color-orange-dark);
+}
+
+.site-page .wp-btn-secondary {
+    background: var(--surface);
+    color: var(--title-color);
+    box-shadow: var(--shadow-soft);
+}
+
+/* ----- Bandeau d'accueil ----- */
+.site-page .wp-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 32px auto 0;
+    padding: 40px 48px;
+    box-sizing: border-box;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .wp-hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--title-color);
+}
+
+.site-page .wp-hero p {
+    max-width: 52ch;
+    margin: 0 0 24px;
+    font-size: 1.05rem;
+    color: var(--color-muted);
+}
+
+.site-page .wp-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.site-page .wp-hero-art img {
+    display: block;
+    width: 300px;
+    max-width: 100%;
+}
+
+/* ----- Contenu + titres de section ----- */
+.site-page .wp-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 40px 64px;
+    box-sizing: border-box;
+}
+
+.site-page .wp-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.site-page .wp-section-head h1,
+.site-page .wp-section-head h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--title-color);
+}
+
+/* ----- Onglets Tous / Perdus / Trouvés ----- */
+.site-page .wp-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--soft-fill);
+}
+
+.site-page .wp-tab {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 999px;
+    background: none;
+    color: var(--color-muted);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.site-page .wp-tab:hover {
+    color: var(--title-color);
+}
+
+.site-page .wp-tab.active {
+    background: var(--surface);
+    color: var(--title-color);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .wp-tab-count {
+    margin-left: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+}
+
+.site-page .wp-message {
+    text-align: center;
+    color: var(--color-muted);
+    padding: 40px 0;
+}
+
+.site-page .wp-message-error {
+    color: var(--color-error);
+}
+
+/* ----- Cartes des annonces ----- */
+.site-page .cards-layout {
+    display: block;
+    padding: 0;
+}
+
+.site-page .cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+    padding: 0;
+}
+
+.site-page .ac-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.site-page .ac-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.site-page .ac-photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--soft-fill);
+}
+
+/* l'image remplit le cadre 4/3 sans le déformer, même si la photo est très haute */
+.site-page .ac-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.site-page .ac-no-photo {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+}
+
+.site-page .ac-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.site-page .ac-badge-perdu {
+    background: var(--color-perdu);
+    color: var(--color-white);
+}
+
+.site-page .ac-badge-trouve {
+    background: var(--color-trouve);
+    color: var(--color-navy);
+}
+
+.site-page .ac-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 16px 18px 18px;
+}
+
+.site-page .ac-body h3 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--title-color);
+}
+
+.site-page .ac-infos {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    font-size: 0.92rem;
+    color: var(--color-muted);
+}
+
+.site-page .ac-infos li:first-child {
+    text-transform: capitalize;
+}
+
+.site-page .ac-desc {
+    margin-top: auto;
+    border-radius: var(--radius-sm);
+    background: var(--soft-fill);
+}
+
+.site-page .ac-desc summary {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--title-color);
+}
+
+.site-page .ac-desc p {
+    margin: 0;
+    padding: 0 12px 10px;
+    font-size: 0.92rem;
+}
+
+/* "Traduction automatique · Voir l'original" sous la description */
+.site-page .ac-desc .ac-trad {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+}
+
+.site-page .ac-trad button {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: var(--color-orange);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.site-page .ac-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.site-page .cards-empty {
+    padding: 48px 24px;
+    border-radius: var(--radius-lg);
+    background: var(--soft-fill);
+    text-align: center;
+    color: var(--color-muted);
+}
+
+/* ----- Pied de page ----- */
+.site-page .wp-footer {
+    padding: 20px 40px;
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--color-muted);
+}
+
+/* ----- Tablette et mobile ----- */
+@media (max-width: 900px) {
+    .site-page .wp-header {
+        flex-wrap: wrap;
+        gap: 10px 16px;
+        padding: 10px 16px;
+    }
+
+    .site-page .wp-brand-name,
+    .site-page .wp-spacer {
+        display: none;
+    }
+
+    /* réglages (langue, thème) + compte poussés à droite */
+    .site-page .wp-header > .reglages {
+        margin-left: auto;
+    }
+
+    .site-page .wp-search {
+        order: 4;
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .site-page .wp-hero {
+        grid-template-columns: 1fr;
+        margin: 16px 16px 0;
+        width: auto;
+        padding: 28px 22px;
+    }
+
+    .site-page .wp-hero-art {
+        display: none;
+    }
+
+    .site-page .wp-content {
+        padding: 28px 16px 48px;
+    }
+}
+
+
+/* ===== Page compte (/account) ===== */
+.site-page .account-page {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    align-items: start;
+    gap: 40px;
+}
+
+/* ----- Carte profil (colonne de gauche) ----- */
+.site-page .acc-card {
+    position: sticky;
+    top: 96px;
+    overflow: hidden;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .acc-card-body {
+    padding: 22px 20px 16px;
+}
+
+.site-page .acc-card-id {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.site-page .acc-avatar {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-orange);
+    color: var(--color-white);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.site-page .acc-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--title-color);
+}
+
+.site-page .acc-type {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.site-page .acc-fields {
+    margin: 0;
+}
+
+.site-page .acc-fields > div {
+    padding: 8px 0;
+    border-top: 1px solid var(--soft-line);
+}
+
+.site-page .acc-fields dt {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+}
+
+.site-page .acc-fields dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--title-color);
+    overflow-wrap: anywhere;
+}
+
+.site-page .acc-tracking {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: rgba(220, 92, 53, 0.08);
+    text-align: center;
+}
+
+.site-page .acc-tracking span,
+.site-page .acc-tracking small {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+.site-page .acc-tracking strong {
+    display: block;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--color-orange);
+}
+
+.site-page .acc-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: var(--color-orange);
+    text-decoration: none;
+}
+
+.site-page .acc-link:hover {
+    text-decoration: underline;
+}
+
+.site-page .acc-delete {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-top: 1px solid var(--soft-line);
+    background: none;
+    text-align: left;
+    font: inherit;
+    font-size: 0.88rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+}
+
+.site-page .acc-delete:hover {
+    background: rgba(220, 53, 69, 0.06);
+    color: var(--color-perdu);
+}
+
+/* ----- Mes annonces (colonne de droite) ----- */
+.site-page .acc-section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.site-page .acc-section-actions .wp-btn {
+    padding: 9px 16px;
+    font-size: 0.92rem;
+}
+
+.site-page .acc-tabs {
+    margin-bottom: 24px;
+}
+
+/* boutons Modifier / Supprimer sous chaque carte */
+.site-page .acc-card-btn {
+    flex: 1;
+    padding: 8px 10px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--soft-fill);
+    color: var(--title-color);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.site-page .acc-card-btn:hover {
+    background: rgba(7, 35, 54, 0.1);
+}
+
+.site-page .acc-card-btn-danger {
+    color: var(--color-perdu);
+}
+
+.site-page .acc-card-btn-danger:hover {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+@media (max-width: 900px) {
+    .site-page .account-page {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .site-page .acc-card {
+        position: static;
+    }
+}
+
+
+/* ===== Page à propos (/about) ===== */
+.site-page .about-page {
+    max-width: 1000px;
+}
+
+.site-page .about-page h1,
+.site-page .about-page h2 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--title-color);
+}
+
+.site-page .about-page h1 {
+    margin: 0 0 16px;
+    font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.site-page .about-page h2 {
+    margin: 0 0 14px;
+    font-size: 1.5rem;
+}
+
+.site-page .about-page p {
+    margin: 0 0 12px;
+    max-width: 65ch;
+}
+
+.site-page .about-page section + section {
+    margin-top: 32px;
+}
+
+/* ----- Introduction ----- */
+.site-page .ab-intro {
+    display: grid;
+    grid-template-columns: 1fr 230px;
+    align-items: center;
+    gap: 40px;
+    padding: 36px 40px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .ab-lead {
+    font-size: 1.1rem;
+}
+
+.site-page .ab-logo {
+    width: 100%;
+    border-radius: var(--radius-lg);
+}
+
+/* ----- Origine du nom ----- */
+.site-page .ab-note {
+    padding: 28px 32px 16px;
+    border-radius: var(--radius-lg);
+    background: rgba(253, 157, 29, 0.12);
+}
+
+/* ----- Comment ça fonctionne ----- */
+.site-page .ab-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.site-page .ab-column {
+    padding: 22px 24px 10px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.site-page .ab-column h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--title-color);
+}
+
+/* petite pastille de couleur : rouge = perdu, jaune = trouvé (comme les badges des annonces) */
+.site-page .ab-column h3::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.site-page .ab-column-perdu h3::before { background: var(--color-perdu); }
+.site-page .ab-column-trouve h3::before { background: var(--color-trouve); }
+
+.site-page .ab-column ul {
+    margin: 0 0 12px;
+    padding-left: 20px;
+}
+
+.site-page .ab-column li {
+    padding: 3px 0;
+}
+
+.site-page .ab-column li::marker {
+    color: var(--color-orange);
+}
+
+/* ----- Ambition : liste numérotée ----- */
+.site-page .ab-list {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: ambition;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 32px;
+}
+
+.site-page .ab-list li {
+    counter-increment: ambition;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    align-content: start;
+    column-gap: 12px;
+}
+
+.site-page .ab-list li::before {
+    content: counter(ambition);
+    grid-row: span 2;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(220, 92, 53, 0.12);
+    color: var(--color-orange);
+    font-weight: 700;
+}
+
+.site-page .ab-list strong {
+    color: var(--title-color);
+}
+
+.site-page .ab-list span {
+    font-size: 0.95rem;
+    color: var(--color-muted);
+}
+
+/* ----- Bandeau final ----- */
+.site-page .ab-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 28px 32px;
+    border-radius: var(--radius-lg);
+    background: var(--color-navy);
+}
+
+.site-page .about-page .ab-cta p {
+    margin: 0;
+    max-width: 40ch;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+@media (max-width: 900px) {
+    .site-page .ab-intro,
+    .site-page .ab-columns,
+    .site-page .ab-list {
+        grid-template-columns: 1fr;
+    }
+
+    .site-page .ab-intro {
+        padding: 26px 22px;
+    }
+
+    .site-page .ab-logo {
+        max-width: 200px;
+    }
+
+    .site-page .ab-note {
+        padding: 22px 20px 10px;
+    }
+}
+
+
+/* ===== Pages en construction (Contact, Services) ===== */
+.site-page .wp-placeholder {
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 40px 32px;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.site-page .wp-placeholder h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--title-color);
+}
+
+.site-page .wp-placeholder p {
+    margin: 0 0 24px;
+    color: var(--color-muted);
+}

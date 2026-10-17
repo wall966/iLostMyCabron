@@ -1,56 +1,102 @@
-import { Card, Accordion, ListGroup } from "react-bootstrap";
+import { useState } from "react";
+import { filtrerParStatut, normalise, traduireEspece, traduireRace } from "./annonces";
+import { usePreferences } from "./preferences";
+import { useTraductionAuto } from "./i18n/traductionAuto";
 
-function AnimalCard({ animal }) {
+const ONGLETS = [
+    { valeur: "tous", cle: "cartes.tous" },
+    { valeur: "perdu", cle: "cartes.perdus" },
+    { valeur: "trouvé", cle: "cartes.trouves" },
+];
+
+// Onglets Tous / Perdus / Trouvés, avec le nombre d'annonces si "compteur" est activé
+export function OngletsStatut({ animals, valeur, onChange, compteur = false }) {
+    const { t } = usePreferences();
     return (
-        <Card className="animal-card">
-            <div className="card-img-wrapper">
-                <Card.Img variant="top" src={animal.Photo} />
-                <span className={`status-badge ${animal.Status === 'perdu' ? 'status-perdu' : 'status-trouve'}`}>
-                    {animal.Status}
+        <div className="wp-tabs" role="tablist">
+            {ONGLETS.map((onglet) => (
+                <button
+                    key={onglet.valeur}
+                    type="button"
+                    role="tab"
+                    aria-selected={valeur === onglet.valeur}
+                    className={`wp-tab ${valeur === onglet.valeur ? "active" : ""}`}
+                    onClick={() => onChange(onglet.valeur)}
+                >
+                    {t(onglet.cle)}
+                    {compteur && <span className="wp-tab-count">{filtrerParStatut(animals, onglet.valeur).length}</span>}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+// Carte d'une annonce : photo avec badge perdu/trouvé, puis les infos
+// "children" = boutons optionnels sous la carte (ex : Modifier / Supprimer dans la page compte)
+export function AnimalCard({ animal, children }) {
+    const { t } = usePreferences();
+    // race et description sont écrites par l'utilisateur : traduction automatique
+    const traduit = useTraductionAuto([animal.Breed, animal.Description]);
+    const [voirOriginal, setVoirOriginal] = useState(false);
+    const isPerdu = normalise(animal.Status) === "perdu";
+    const espece = [traduireEspece(t, animal.Species), traduireRace(t, animal.Breed, traduit)].filter(Boolean).join(" · ");
+    const description = traduit(animal.Description);
+    const estTraduite = description !== animal.Description;
+
+    return (
+        <article className="ac-card">
+            <div className="ac-photo">
+                {animal.Photo
+                    ? <img src={animal.Photo} alt={animal.Name || t("cartes.photoAlt")} />
+                    : <span className="ac-no-photo">{t("cartes.pasDePhoto")}</span>}
+                <span className={`ac-badge ${isPerdu ? "ac-badge-perdu" : "ac-badge-trouve"}`}>
+                    {isPerdu ? t("cartes.perdu") : t("cartes.trouve")}
                 </span>
             </div>
-            <Card.Body className="animal-card-body">
-                <Card.Title>{animal.Name}</Card.Title>
 
-                <ListGroup className="list-group-flush">
-                    <ListGroup.Item>{animal.Breed}</ListGroup.Item>
-                    <ListGroup.Item>Date et heure : {animal.Date_time}</ListGroup.Item>
-                    <ListGroup.Item>Localisation : {animal.GPS_coordinates || 'Non renseignée'}</ListGroup.Item>
-                </ListGroup>
-                <Accordion className="mt-2">
-                    <Accordion.Item eventKey="0">
-                        <Accordion.Header>Voir la description</Accordion.Header>
-                        <Accordion.Body>
-                            {animal.Description}
-                            <hr />
-                            Contact :
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>
-            </Card.Body>
-        </Card>
+            <div className="ac-body">
+                <h3>{animal.Name || t("cartes.nomInconnu")}</h3>
+                <ul className="ac-infos">
+                    <li>{espece || t("cartes.especeInconnue")}</li>
+                    <li>{isPerdu ? t("cartes.disparuLe") : t("cartes.trouveLe")} {animal.Date_time || "—"}</li>
+                    <li>{animal.GPS_coordinates || t("cartes.lieuInconnu")}</li>
+                </ul>
+                {animal.Description && (
+                    <details className="ac-desc">
+                        <summary>{t("cartes.voirDescription")}</summary>
+                        <p>{voirOriginal ? animal.Description : description}</p>
+                        {estTraduite && (
+                            <p className="ac-trad">
+                                {t("cartes.traductionAuto")} ·{" "}
+                                <button type="button" onClick={() => setVoirOriginal(!voirOriginal)}>
+                                    {voirOriginal ? t("cartes.voirTraduction") : t("cartes.voirOriginal")}
+                                </button>
+                            </p>
+                        )}
+                    </details>
+                )}
+                {children && <div className="ac-actions">{children}</div>}
+            </div>
+        </article>
     );
 }
 
 function Cards({ filtre, animals, filters }) {
-    // Ignore les accents et majuscules (la base de données utilise "trouvé")
-    const normalise = (str) => (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const { t } = usePreferences();
 
-    const filteredAnimals = animals.filter((animal) => {
-        // Filtre par statut (menu latéral du header)
-        if (filtre !== "tous" && normalise(animal.Status) !== normalise(filtre)) return false;
-
-        // Filtre par la barre de recherche (venant du Welcome.jsx)
-        return filters.every((f) => {
-            if (f.type === 'Nom') return animal.Name === f.value;
-            if (f.type === 'Statut') return animal.Status === f.value;
-            if (f.type === 'Espèce') return animal.Species === f.value;
-            if (f.type === 'Race') return animal.Breed === f.value;
-            if (f.type === 'Numéro de puce') return animal.Chip_number === f.value;
-            if (f.type === 'Description') return animal.Description === f.value;
-            return true;
-        });
+    // Filtre par statut (onglets) puis par la barre de recherche (venant du Welcome.jsx)
+    // f.type = nom du champ de la base de données (Name, Status, Species...)
+    const filteredAnimals = filtrerParStatut(animals, filtre).filter((animal) => {
+        return filters.every((f) => animal[f.type] === f.value);
     });
+
+    if (filteredAnimals.length === 0) {
+        return (
+            <div className="cards-empty">
+                <p>{t("cartes.aucune")}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="cards-layout">
